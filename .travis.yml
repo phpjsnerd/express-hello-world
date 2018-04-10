@@ -1,8 +1,20 @@
 sudo: required
 services:
-  - docker
+- docker
 before_install:
-  - docker build -t phpjsnerd/express-hello-world .
+- docker build -t phpjsnerd/express-hello-world .
+env:
+  global:
+  - secure: TUuCGZvwYz7E+fj6p+KCItt9knn5Jfv7BTkA7U1KBTZmBIZAwqP2P9+4ttkCE3wta6bC+JEV4BStSMXi/02zyWI29b08j7odw5JiYts77wUsgns04yWbXcYRWn6pIy07B2l/NG6kM6o4YxXgLKchWqhkLSaTpTkCwMynpCYwyHFh5DgQfCxTAwzG2w8sKlOUFTna/SU0+arNr0dvS6Ue696NQ+zj+qHHOsuaCCQuQZQHbzNkJyz9kdoxiS10MuQ3Y56dM0DfedE1zi5D+/GbCTD5A4loO0y0U3V9nrqnhc3P1CPAoBgHiFsHiHODQgUCj6I4X2R+pNQOt2UHC+TzI3LGX1ARz++7NyXnJaqlxiP+XPvlk299X92mW7on6G+GeouAMclvrRK4MgxrpqEcC/4oAY+u6AwmIeunBYNHOaTFlg/7infB+gcUlC2FtPh0vGm4rQYuNqqSQUq8GQzvGknfmxdHwqU2q7BN9Xfw3Oh1ZAFry3H9Fj9hoG8vUQzzARO7cdGK4hSQoNjCPa45kSXE7voOU/ZCX6u0sXosRmrBLX3QA7D0lBYfF1H1M/dbK8OcyCd7XTjr/5W1YkbG9jRGpx9OetUg0FZdzRZV0acGIPCIAJh4tNAyrrN23/rorRv2jNxnubOpgkUxrOK8e4ujvWKXKRr5FYU33eUj+/c=
+  - secure: X5KPFig9+NQo2yZn9YS97iahOPLFAPBv82gyBH9/irdwLdy7QbIpAq/XrK7kIOma29d7V/isIBfrpomLhLMJQUxaI+DqtGl1hzHUm9FguM3/jglh07Nh4Yj0om20eqxUlb0mxgGHc+CB0xZs4FwzyuMyrIySULMI1UkYx8LR9DVar+tjeHwXhbMiiDoPBsyc+X54T/tEgPB43/NUYB6BJyt07I6bltgA0NRyePwoE41lRFDqrftdgPdKrmzREmULdVbwcxwKmd5Q2zadNCdvVJF+8dTFXZfOQ7dOG/Cudn5trZfcK3x7QcGbRp1M+0rYXSKneuILV7kDuMCZCvw7dxCwQjEHEA98H03+uJPZwa4r0lRnKdtxMHu6+c5djMZUzfD8YJcWehOjP8vndjGwyvOGYEiMjlEvQi4aN7wzjDMh4ELrnbu3lBy4WNHcCnF4KHFLY3RcY87tWT2yw/x1hqKzdnSsx72FU6e0/UKWps3MRaABVwhkHdM8dZzglAyaQaHMhJhxa53gl8t7Ud5SSK9/2E44DNyLZwLUw/bBUJtkn6U/gKqL7GfMwEzgPGIJV0ho+ynbI7UHexzBkULTSL/pVJysZrZ398kY0AELx70rbuw0DyG38BId0i3GvECE79/1Z1ZmWKSm+tJfgvn04VDW9oc5RE9EkqbNMFfFqtU=
+  - secure: Br406peCh34+RAinmX9pe8hdLTFnlAPTuEEIEbPesCetQUWKGPtlXaegJg7xx7Bb2nQWWScRoh+TySBIWZTdxPt3oTDQSh51RpwOoWgOt0Mzpxkd1s02ABWNOKN5wpxtn//+mdCohnl9OTsczgOCDTrLK8e5qpMTzs7O1B/subDOSB4mHMlqUZkZIuqh/w1BFh2V90rrlGGrvfz4hbAkqtcqGAMCa8GiuzrZI6Y3rCg1W+WULyQu3yvMydWxo0e2XOC2+GXk/eZG9XzwINOczDBZjbes0RVmIXMa/kgDo69jelYQpHvBhzVFWIq8BQl2SoAbsJg8vH5hvT6rJYX23T06SsF9sWeFK/1KDbaOdYHTOe41I64CU8hYxzFSL7yA7/6HUcGZD2UE/4Ax3/62NHa+vyuI/nIwGIiwJPq10/16Katab4WX8I0T9t3DDRVJQMrbdHNlwuvVcX5jWXqV/BgqoNFt81eWVL3X4f1cdzXoRE2Z7t046s5QZvzS2LVR7IgJWX/1arEgrc6ZTAfBogEiG2Y5VWsOQfxFdoX1XeFgy8SiWWwuEUBLDsPW1jwZjTrlU2vRRu3IIlLQbXLCHc3ARDenxhiymrDcz+FpykMErREg79ILXfb4Y4I0ch0UqylC/sFDwp0/20w24XAVVdadnmY7GlbM0OAT3sD3kw0=
+  - COMMIT=${TRAVIS_COMMIT::8}
   
-  
- 
+after_success:
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=phpjsnerd/express-hello-world
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
